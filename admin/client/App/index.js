@@ -4,26 +4,36 @@
  */
 
 // Needed for ES6 generators (redux-saga) to work
-import 'babel-polyfill';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Router, Route, browserHistory, IndexRoute } from 'react-router';
-import { Provider } from 'react-redux';
-import { syncHistoryWithStore } from 'react-router-redux';
+import 'babel-polyfill'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { Router, Route, browserHistory, IndexRoute } from 'react-router'
+import { Provider } from 'react-redux'
+import { syncHistoryWithStore } from 'react-router-redux'
 
-import App from './App';
-import Home from './screens/Home';
-import Item from './screens/Item';
-import List from './screens/List';
+import App from './App'
+import Home from './screens/Home'
+import Item from './screens/Item'
+import List from './screens/List'
+import MyHome from './screens/MyHome'
+import store from './store'
 
-import store from './store';
+const ItemHoc = props => {
+	if (
+		props.params.listId === 'home-pages' &&
+		props.params.itemId !== undefined
+	) {
+		return <MyHome {...props} />
+	}
+	return <Item {...props} />
+}
 
 // Sync the browser history to the Redux store
-const history = syncHistoryWithStore(browserHistory, store);
+const history = syncHistoryWithStore(browserHistory, store)
 
 // Initialise Keystone.User list
-import { listsByKey } from '../utils/lists';
-Keystone.User = listsByKey[Keystone.userList];
+import { listsByKey } from '../utils/lists'
+Keystone.User = listsByKey[Keystone.userList]
 
 ReactDOM.render(
 	<Provider store={store}>
@@ -31,9 +41,9 @@ ReactDOM.render(
 			<Route path={Keystone.adminPath} component={App}>
 				<IndexRoute component={Home} />
 				<Route path=":listId" component={List} />
-				<Route path=":listId/:itemId" component={Item} />
+				<Route path=":listId/:itemId" component={ItemHoc} />
 			</Route>
 		</Router>
 	</Provider>,
 	document.getElementById('react-root')
-);
+)
