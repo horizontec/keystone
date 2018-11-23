@@ -154,7 +154,6 @@ imageUploader.prototype.updateItem = function (item, data, files, callback) {
 	// Prepare values
 	var value = this.getValueFromData(data);
 	var uploadedFile;
-
 	// Providing the string "remove" removes the file and resets the field
 	if (value === 'remove') {
 		this.remove(item);
