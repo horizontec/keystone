@@ -150,7 +150,6 @@ var ItemView = React.createClass({
 	},
 	render() {
 		// If we don't have any data yet, show the loading indicator
-		console.warn('MYHOME')
 		if (!this.props.ready) {
 			return (
 				<Center height="50vh" data-screen-id="item">
@@ -171,19 +170,19 @@ var ItemView = React.createClass({
 								list={this.props.currentList}
 								data={this.props.data}
 								toggleCreate={this.toggleCreateModal}
-							/>
-							<CreateForm
+							/> */}
+							{/* <CreateForm
 								list={this.props.currentList}
 								isOpen={this.state.createIsOpen}
 								onCancel={() => this.toggleCreateModal(false)}
 								onCreate={item => this.onCreate(item)}
-							/>
+							/> */}
 							<EditForm
 								list={this.props.currentList}
 								data={this.props.data}
 								dispatch={this.props.dispatch}
 								router={this.context.router}
-							/> */}
+							/>
 						</Container>
 						{this.renderRelationships()}
 					</div>

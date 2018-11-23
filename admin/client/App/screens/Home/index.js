@@ -15,6 +15,9 @@ import {
 	loadCounts,
 } from './actions';
 
+import { selectList, loadItems } from '../List/actions'
+
+
 
 var HomeView = React.createClass({
 	displayName: 'HomeView',
@@ -27,6 +30,9 @@ var HomeView = React.createClass({
 	// from the API
 	componentDidMount () {
 		this.props.dispatch(loadCounts());
+		// Load home pages
+		this.props.dispatch(selectList('home-pages'));
+		this.props.dispatch(loadItems())
 	},
 	getSpinner () {
 		if (this.props.counts && Object.keys(this.props.counts).length === 0
@@ -39,6 +45,9 @@ var HomeView = React.createClass({
 	},
 	render () {
 		const spinner = this.getSpinner();
+		const homePageId = this.props.items.results[0] === undefined ? null : this.props.items.results[0].id
+		const hasCreatedHomePage = this.props.counts.HomePage > 0
+
 		return (
 			<Container data-screen-id="home">
 				<div className="dashboard-header">
@@ -64,10 +73,11 @@ var HomeView = React.createClass({
 							{/* Render nav with sections */}
 							{Keystone.nav.sections.map((navSection) => {
 								const isHomePage = navSection.label === 'Home'
-								const hasCreatedHomePage = this.props.counts.HomePage > 0
 								if(isHomePage) {
 									const list = navSection.lists[0] || {}
-									const href = list.external ? list.path : `${Keystone.adminPath}/${list.path}`;
+									const createHref = list.external ? list.path : `${Keystone.adminPath}/${list.path}`;
+									const href = hasCreatedHomePage ? `${Keystone.adminPath}/${list.path}/${homePageId}` : createHref;
+
 									return (
 										<Section key={navSection.key} id={navSection.key} label={navSection.label}>
 											<ListWithSingleItem
@@ -117,4 +127,8 @@ export default connect((state) => ({
 	counts: state.home.counts,
 	loading: state.home.loading,
 	error: state.home.error,
+	lists: state.lists,
+	loading: state.lists.loading,
+	currentList: state.lists.currentList,
+	items: state.lists.items,
 }))(HomeView);

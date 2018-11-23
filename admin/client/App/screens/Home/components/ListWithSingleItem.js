@@ -10,26 +10,41 @@ class ListWithSingleItem extends React.Component {
 			'data-list-path': path,
     };
     const label = hasCreatedHomePage ? 'Edit home page' : 'Create home page'
-		return (
-			<div className="dashboard-group__lists">
+    if(!hasCreatedHomePage) {
+      return (
+        <div className="dashboard-group__lists">
+          <div className="dashboard-group__list" {...opts}>
+            <span className="dashboard-group__list-inner">
+              <div className="dashboard-group__list-tile">
+                <div className="dashboard-group__list-label">{label}</div>
+                <div className="dashboard-group__list-count">{spinner || count}</div>
+              </div>
+              <Link
+                  to={href + '?create'}
+                  className="dashboard-group__list-create octicon octicon-plus"
+                  title="Create"
+                  tabIndex="-1"
+                />
+            </span>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="dashboard-group__lists">
         <div className="dashboard-group__list" {...opts}>
           <span className="dashboard-group__list-inner">
-            <Link to={href} className="dashboard-group__list-tile">
+            <Link to={href} className="dashboard-group__list-tile" >
               <div className="dashboard-group__list-label">{label}</div>
               <div className="dashboard-group__list-count">{spinner || count}</div>
             </Link>
-            {(!hasCreatedHomePage) && (
-              <Link
-                to={href + '?create'}
-                className="dashboard-group__list-create octicon octicon-plus"
-                title="Create"
-                tabIndex="-1"
-              />
-					  )}
+
           </span>
         </div>
       </div>
-		);
+    );
+
   }
 }
 

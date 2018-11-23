@@ -67,7 +67,6 @@ const ListView = React.createClass({
 		// When we directly navigate to a list without coming from another client
 		// side routed page before, we need to initialize the list and parse
 		// possibly specified query parameters
-
 		this.props.dispatch(selectList(this.props.params.listId));
 
 		const isNoCreate = this.props.lists.data[this.props.params.listId].nocreate;
@@ -512,6 +511,7 @@ const ListView = React.createClass({
 		);
 	},
 	render () {
+		console.log(this.props.currentList)
 		if (!this.props.ready) {
 			return (
 				<Center height="50vh" data-screen-id="list">

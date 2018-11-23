@@ -3,6 +3,9 @@ import {
 	LOAD_COUNTS,
 	COUNTS_LOADING_SUCCESS,
 	COUNTS_LOADING_ERROR,
+	FETCH_HOMEPAGE,
+	FETCH_HOMEPAGE_ERROR,
+	FETCH_HOMEPAGE_SUCCESS,
 } from './constants';
 import { NETWORK_ERROR_RETRY_DELAY } from '../../../constants';
 
@@ -62,5 +65,31 @@ export function countsLoadingError (error) {
 		setTimeout(() => {
 			dispatch(loadCounts());
 		}, NETWORK_ERROR_RETRY_DELAY);
+	};
+}
+
+export function fetchHomePageId (error) {
+	return (dispatch) => {
+		dispatch({
+			type: FETCH_HOMEPAGE,
+		});
+		xhr({
+			url: `${Keystone.adminPath}/api/counts`,
+		}, (err, resp, body) => {
+			if (err) {
+				dispatch(countsLoadingError(err));
+				return;
+			}
+			try {
+				body = JSON.parse(body);
+				if (body.counts) {
+					dispatch(countsLoaded(body.counts));
+				}
+			} catch (e) {
+				console.log('Error parsing results json:', e, body);
+				dispatch(countsLoadingError(e));
+				return;
+			}
+		});
 	};
 }
