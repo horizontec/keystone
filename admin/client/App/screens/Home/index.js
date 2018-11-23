@@ -8,11 +8,13 @@ import { Container, Spinner } from '../../elemental';
 import { connect } from 'react-redux';
 
 import Lists from './components/Lists';
+import ListWithSingleItem from './components/ListWithSingleItem';
 import Section from './components/Section';
 import AlertMessages from '../../shared/AlertMessages';
 import {
 	loadCounts,
 } from './actions';
+
 
 var HomeView = React.createClass({
 	displayName: 'HomeView',
@@ -61,6 +63,24 @@ var HomeView = React.createClass({
 						<div>
 							{/* Render nav with sections */}
 							{Keystone.nav.sections.map((navSection) => {
+								const isHomePage = navSection.label === 'Home'
+								const hasCreatedHomePage = this.props.counts.HomePage > 0
+								if(isHomePage) {
+									const list = navSection.lists[0] || {}
+									const href = list.external ? list.path : `${Keystone.adminPath}/${list.path}`;
+									return (
+										<Section key={navSection.key} id={navSection.key} label={navSection.label}>
+											<ListWithSingleItem
+												key={list.path}
+												label={navSection.label}
+												path={list.path}
+												spinner={spinner}
+												hasCreatedHomePage={hasCreatedHomePage}
+												href={href}
+											/>
+										</Section>
+									);
+								}
 								return (
 									<Section key={navSection.key} id={navSection.key} label={navSection.label}>
 										<Lists
