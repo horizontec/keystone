@@ -67,10 +67,33 @@ const MobileNavigation = React.createClass({
 			this.hideMenu();
 		}
 	},
+	renderBrand () {
+		// TODO: support navbarLogo from keystone config
+
+		const { brand, currentSectionKey } = this.props;
+		const className = currentSectionKey === 'dashboard' ? 'primary-navbar__brand primary-navbar__item--active' : 'primary-navbar__brand';
+
+		return (
+			<MobileSectionItem
+					className={className}
+					href={Keystone.adminPath}
+					label="octicon-home"
+					currentListKey={this.props.currentListKey}
+					onClick={this.toggleMenu}
+				>
+					<span className="octicon octicon-home" />
+				</MobileSectionItem>
+		);
+	},
 	renderNavigation () {
 		if (!this.props.sections || !this.props.sections.length) return null;
 
 		return this.props.sections.map((section) => {
+			// Exclude homepage from nav
+			if(section.key === 'home') {
+				return null
+			}
+
 			// Get the link and the classname
 			const href = section.lists[0].external ? section.lists[0].path : `${Keystone.adminPath}/${section.lists[0].path}`;
 			const className = (this.props.currentSectionKey && this.props.currentSectionKey === section.key) ? 'MobileNavigation__section is-active' : 'MobileNavigation__section';
@@ -103,6 +126,7 @@ const MobileNavigation = React.createClass({
 		return (
 			<nav className="MobileNavigation__menu">
 				<div className="MobileNavigation__sections">
+					{this.renderBrand()}
 					{this.renderNavigation()}
 				</div>
 			</nav>

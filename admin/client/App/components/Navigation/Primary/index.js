@@ -85,12 +85,20 @@ var PrimaryNavigation = React.createClass({
 			</PrimaryNavItem>
 		);
 	},
+
+	getLinkToHomePage () {
+		// TODO: implement
+	},
+
 	// Render the navigation
 	renderNavigation () {
 		if (!this.props.sections || !this.props.sections.length) return null;
 
 		return this.props.sections.map((section) => {
 			// Get the link and the class name
+			if(section.key === 'home') {
+				return null
+			}
 			const to = !section.lists[0].external && `${Keystone.adminPath}/${section.lists[0].path}`;
 			const href = section.lists[0].external && section.lists[0].path;
 			const isActive = this.props.currentSectionKey && this.props.currentSectionKey === section.key;

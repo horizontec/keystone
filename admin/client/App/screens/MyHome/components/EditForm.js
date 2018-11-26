@@ -212,6 +212,8 @@ var EditForm = React.createClass({
 		}
 	},
 	renderNameField () {
+		// Horizon: hide name field
+		return null
 		var nameField = this.props.list.nameField;
 		var nameFieldIsFormHeader = this.props.list.nameFieldIsFormHeader;
 		var wrapNameField = field => (
@@ -386,13 +388,13 @@ var EditForm = React.createClass({
 	},
 	render () {
 		return (
-			<form ref="editForm" className="EditForm-container">
+			<form ref="editForm" className="EditForm-container" style={{paddingTop: '2rem'}}>
 				{(this.state.alerts) ? <AlertMessages alerts={this.state.alerts} /> : null}
 				<Grid.Row>
 					<Grid.Col large="three-quarters">
 						<Form layout="horizontal" component="div">
-							{this.renderNameField()}
-							{this.renderKeyOrId()}
+							{/* {this.renderNameField()}
+							{this.renderKeyOrId()} */}
 							{this.renderFormElements()}
 							{this.renderTrackingMeta()}
 						</Form>

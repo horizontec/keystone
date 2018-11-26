@@ -233,7 +233,6 @@ module.exports = Field.create({
 		)
 	},
 	renderUI() {
-		console.log('AXYENNNA')
 		const { label, note, path, thumb } = this.props
 		const isImage = this.isImage()
 		const hasFile = this.hasFile()
