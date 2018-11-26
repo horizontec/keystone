@@ -511,7 +511,6 @@ const ListView = React.createClass({
 		);
 	},
 	render () {
-		console.log(this.props.currentList)
 		if (!this.props.ready) {
 			return (
 				<Center height="50vh" data-screen-id="list">

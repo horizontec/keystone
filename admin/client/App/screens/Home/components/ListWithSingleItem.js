@@ -9,6 +9,7 @@ class ListWithSingleItem extends React.Component {
 		var opts = {
 			'data-list-path': path,
     };
+    // HORIZON TODO: translations
     const label = hasCreatedHomePage ? 'Edit home page' : 'Create home page'
     if(!hasCreatedHomePage) {
       return (

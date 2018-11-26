@@ -74,6 +74,11 @@ var SecondaryNavigation = React.createClass({
 	render () {
 		if (!this.state.navIsVisible) return null;
 
+		// Hide breadcrumbs on home-pages
+		if (this.props.currentListKey === 'home-pages') {
+			return null
+		}
+
 		return (
 			<nav className="secondary-navbar">
 				<Container clearFloatingChildren>
