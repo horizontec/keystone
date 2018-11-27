@@ -57,15 +57,23 @@ const RelatedItemsList = React.createClass({
 		if (!refList.fields[relationship.refPath]) {
 			const err = (
 				<Alert color="danger">
-					<strong>Error:</strong> Related List <strong>{refList.label}</strong> has no field <strong>{relationship.refPath}</strong>
+					<strong>Error:</strong> Related List <strong>{refList.label}</strong>{' '}
+					has no field <strong>{relationship.refPath}</strong>
 				</Alert>
 			);
 			return this.setState({ err });
 		}
-		this.props.dispatch(loadRelationshipItemData({ columns, refList, relatedItemId, relationship }));
+		this.props.dispatch(
+			loadRelationshipItemData({
+				columns,
+				refList,
+				relatedItemId,
+				relationship,
+			})
+		);
 	},
 	renderItems () {
-		const tableBody = (this.isSortable()) ? (
+		const tableBody = this.isSortable() ? (
 			<DragDrop
 				columns={this.state.columns}
 				items={this.props.items}
@@ -73,13 +81,15 @@ const RelatedItemsList = React.createClass({
 			/>
 		) : (
 			<tbody>
-				{this.props.items.results.map((item) => {
-					return (<ListRow
-						key={item.id}
-						columns={this.state.columns}
-						item={item}
-						refList={this.props.refList}
-					/>);
+				{this.props.items.results.map(item => {
+					return (
+						<ListRow
+							key={item.id}
+							columns={this.state.columns}
+							item={item}
+							refList={this.props.refList}
+						/>
+					);
 				})}
 			</tbody>
 		);
@@ -99,22 +109,26 @@ const RelatedItemsList = React.createClass({
 		);
 	},
 	renderTableCols () {
-		const cols = this.state.columns.map((col) => <col width={col.width} key={col.path} />);
+		const cols = this.state.columns.map(col => (
+			<col width={col.width} key={col.path} />
+		));
 		return <colgroup>{cols}</colgroup>;
 	},
 	renderTableHeaders () {
-		const cells = this.state.columns.map((col) => {
+		const cells = this.state.columns.map(col => {
 			return <th key={col.path}>{col.label}</th>;
 		});
 
 		// add sort col when available
 		if (this.isSortable()) {
-			cells.unshift(
-				<th width={TABLE_CONTROL_COLUMN_WIDTH} key="sortable" />
-			);
+			cells.unshift(<th width={TABLE_CONTROL_COLUMN_WIDTH} key="sortable" />);
 		}
 
-		return <thead><tr>{cells}</tr></thead>;
+		return (
+			<thead>
+				<tr>{cells}</tr>
+			</thead>
+		);
 	},
 	render () {
 		if (this.state.err) {
@@ -130,7 +144,9 @@ const RelatedItemsList = React.createClass({
 
 		return (
 			<div className="Relationship">
-				<h3 className="Relationship__link"><Link to={listHref}>{this.props.refList.label}</Link></h3>
+				<h3 className="Relationship__link">
+					<Link to={listHref}>{this.props.refList.label}</Link>
+				</h3>
 				{this.props.items ? this.renderItems() : loadingElement}
 			</div>
 		);
