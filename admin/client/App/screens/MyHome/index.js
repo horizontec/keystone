@@ -184,7 +184,7 @@ var ItemView = React.createClass({
 							/>
 						</Container>
 
-						{this.renderRelationships()}
+						{/* {this.renderRelationships()} */}
 					</div>
 				)}
 			</div>

@@ -9,6 +9,11 @@ class Sortable extends Component {
 		super(props);
 
 		this.generatePanes = this.generatePanes.bind(this);
+		this.handleOrderChange = this.handleOrderChange.bind(this);
+	}
+
+	handleOrderChange (e, id, target, newOrder) {
+		console.log(newOrder);
 	}
 
 	generatePanes (items) {
@@ -24,7 +29,7 @@ class Sortable extends Component {
 					style={{
 						borderRadius: 5,
 						opacity: 1,
-						border: '3px solid #ccc',
+						border: '3px dotted #ccc',
 						backgroundColor: 'rgb(245,245,245)',
 						display: 'flex',
 						alignItems: 'center',
@@ -46,6 +51,7 @@ class Sortable extends Component {
 				direction="horizontal"
 				margin={20}
 				defaultOrder={defaultOrder}
+				onDragStop={this.handleOrderChange}
 			>
 				{panes}
 			</SortablePane>

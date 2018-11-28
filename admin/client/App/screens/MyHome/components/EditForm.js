@@ -63,7 +63,8 @@ var EditForm = React.createClass({
 			confirmationDialog: null,
 			loading: false,
 			lastValues: null, // used for resetting
-			focusFirstField: !this.props.list.nameField && !this.props.list.nameFieldIsFormHeader,
+			focusFirstField:
+				!this.props.list.nameField && !this.props.list.nameFieldIsFormHeader,
 		};
 	},
 	componentDidMount () {
@@ -91,10 +92,13 @@ var EditForm = React.createClass({
 		return props;
 	},
 	handleChange (event) {
+		console.warn('EDIT_CHANGE_FORM', event);
 		const values = assign({}, this.state.values);
 
 		values[event.path] = event.value;
-		this.setState({ values });
+		this.setState({ values }, () => {
+			console.log('STATE', this.state);
+		});
 	},
 
 	toggleDeleteDialog () {
@@ -132,20 +136,32 @@ var EditForm = React.createClass({
 
 		// Fix for Safari where XHR form submission fails when input[type=file] is empty
 		// https://stackoverflow.com/questions/49614091/safari-11-1-ajax-xhr-form-submission-fails-when-inputtype-file-is-empty
-		$(editForm).find("input[type='file']").each(function () {
-			if ($(this).get(0).files.length === 0) { $(this).prop('disabled', true); }
-		});
+		$(editForm)
+			.find("input[type='file']")
+			.each(function () {
+				if ($(this).get(0).files.length === 0) {
+					$(this).prop('disabled', true);
+				}
+			});
 
 		const formData = new FormData(editForm);
+		$(editForm)
+			.find("input[type='file']")
+			.each(function () {
+				if ($(this).get(0).files.length === 0) {
+					$(this).prop('disabled', false);
+				}
+			});
 
-		$(editForm).find("input[type='file']").each(function () {
-			if ($(this).get(0).files.length === 0) { $(this).prop('disabled', false); }
-		});
+		this.state.values.products.forEach(k => formData.append('products', k));
+		this.state.values.clients.forEach(k => formData.append('clients', k));
+		this.state.values.posts.forEach(k => formData.append('posts', k));
 
 		// Show loading indicator
 		this.setState({
 			loading: true,
 		});
+		console.log('SAVING_FORMDATA', formData);
 
 		list.updateItem(data.id, formData, (err, data) => {
 			smoothScrollTop();
@@ -183,20 +199,46 @@ var EditForm = React.createClass({
 						modified="ID:"
 						normal={`${upcase(list.autokey.path)}: `}
 						title="Press <alt> to reveal the ID"
-						className="EditForm__key-or-id__label" />
+						className="EditForm__key-or-id__label"
+					/>
 					<AltText
-						modified={<input ref="keyOrIdInput" onFocus={this.handleKeyFocus} value={this.props.data.id} className="EditForm__key-or-id__input" readOnly />}
-						normal={<input ref="keyOrIdInput" onFocus={this.handleKeyFocus} value={this.props.data[list.autokey.path]} className="EditForm__key-or-id__input" readOnly />}
+						modified={
+							<input
+								ref="keyOrIdInput"
+								onFocus={this.handleKeyFocus}
+								value={this.props.data.id}
+								className="EditForm__key-or-id__input"
+								readOnly
+							/>
+						}
+						normal={
+							<input
+								ref="keyOrIdInput"
+								onFocus={this.handleKeyFocus}
+								value={this.props.data[list.autokey.path]}
+								className="EditForm__key-or-id__input"
+								readOnly
+							/>
+						}
 						title="Press <alt> to reveal the ID"
-						className="EditForm__key-or-id__field" />
+						className="EditForm__key-or-id__field"
+					/>
 				</div>
 			);
 		} else if (list.autokey && this.props.data[list.autokey.path]) {
 			return (
 				<div className={className}>
-					<span className="EditForm__key-or-id__label">{list.autokey.path}: </span>
+					<span className="EditForm__key-or-id__label">
+						{list.autokey.path}:{' '}
+					</span>
 					<div className="EditForm__key-or-id__field">
-						<input ref="keyOrIdInput" onFocus={this.handleKeyFocus} value={this.props.data[list.autokey.path]} className="EditForm__key-or-id__input" readOnly />
+						<input
+							ref="keyOrIdInput"
+							onFocus={this.handleKeyFocus}
+							value={this.props.data[list.autokey.path]}
+							className="EditForm__key-or-id__input"
+							readOnly
+						/>
 					</div>
 				</div>
 			);
@@ -205,7 +247,13 @@ var EditForm = React.createClass({
 				<div className={className}>
 					<span className="EditForm__key-or-id__label">ID: </span>
 					<div className="EditForm__key-or-id__field">
-						<input ref="keyOrIdInput" onFocus={this.handleKeyFocus} value={this.props.data.id} className="EditForm__key-or-id__input" readOnly />
+						<input
+							ref="keyOrIdInput"
+							onFocus={this.handleKeyFocus}
+							value={this.props.data.id}
+							className="EditForm__key-or-id__input"
+							readOnly
+						/>
 					</div>
 				</div>
 			);
@@ -213,13 +261,11 @@ var EditForm = React.createClass({
 	},
 	renderNameField () {
 		// Horizon: hide name field
-		return null
+		return null;
 		var nameField = this.props.list.nameField;
 		var nameFieldIsFormHeader = this.props.list.nameFieldIsFormHeader;
 		var wrapNameField = field => (
-			<div className="EditForm__name-field">
-				{field}
-			</div>
+			<div className="EditForm__name-field">{field}</div>
 		);
 		if (nameFieldIsFormHeader) {
 			var nameFieldProps = this.getFieldProps(nameField);
@@ -235,9 +281,7 @@ var EditForm = React.createClass({
 				React.createElement(Fields[nameField.type], nameFieldProps)
 			);
 		} else {
-			return wrapNameField(
-				<h2>{this.props.data.name || '(no name)'}</h2>
-			);
+			return wrapNameField(<h2>{this.props.data.name || '(no name)'}</h2>);
 		}
 	},
 	renderFormElements () {
@@ -250,7 +294,9 @@ var EditForm = React.createClass({
 				this.props.list.nameField
 				&& el.field === this.props.list.nameField.path
 				&& this.props.list.nameFieldIsFormHeader
-			) return;
+			) {
+				return;
+			}
 
 			if (el.type === 'heading') {
 				headings++;
@@ -263,12 +309,17 @@ var EditForm = React.createClass({
 				var field = this.props.list.fields[el.field];
 				var props = this.getFieldProps(field);
 				if (typeof Fields[field.type] !== 'function') {
-					return React.createElement(InvalidFieldType, { type: field.type, path: field.path, key: field.path });
+					return React.createElement(InvalidFieldType, {
+						type: field.type,
+						path: field.path,
+						key: field.path,
+					});
 				}
 				props.key = field.path;
 				if (index === 0 && this.state.focusFirstField) {
 					props.autoFocus = true;
 				}
+
 				return React.createElement(Fields[field.type], props);
 			}
 		}, this);
@@ -299,15 +350,25 @@ var EditForm = React.createClass({
 						</LoadingButton>
 					)}
 					{!this.props.list.noedit && (
-						<Button disabled={loading} onClick={this.toggleResetDialog} variant="link" color="cancel" data-button="reset">
-							<ResponsiveText
-								hiddenXS="reset changes"
-								visibleXS="reset"
-							/>
+						<Button
+							disabled={loading}
+							onClick={this.toggleResetDialog}
+							variant="link"
+							color="cancel"
+							data-button="reset"
+						>
+							<ResponsiveText hiddenXS="reset changes" visibleXS="reset" />
 						</Button>
 					)}
 					{!this.props.list.nodelete && (
-						<Button disabled={loading} onClick={this.toggleDeleteDialog} variant="link" color="delete" style={styles.deleteButton} data-button="delete">
+						<Button
+							disabled={loading}
+							onClick={this.toggleDeleteDialog}
+							variant="link"
+							color="delete"
+							style={styles.deleteButton}
+							data-button="delete"
+						>
 							<ResponsiveText
 								hiddenXS={`delete ${this.props.list.singular.toLowerCase()}`}
 								visibleXS="delete"
@@ -330,24 +391,35 @@ var EditForm = React.createClass({
 		var data = {};
 
 		if (this.props.list.tracking.createdAt) {
-			data.createdAt = this.props.data.fields[this.props.list.tracking.createdAt];
+			data.createdAt = this.props.data.fields[
+				this.props.list.tracking.createdAt
+			];
 			if (data.createdAt) {
 				elements.push(
 					<FormField key="createdAt" label="Created on">
-						<FormInput noedit title={moment(data.createdAt).format('DD/MM/YYYY h:mm:ssa')}>{moment(data.createdAt).format('Do MMM YYYY')}</FormInput>
+						<FormInput
+							noedit
+							title={moment(data.createdAt).format('DD/MM/YYYY h:mm:ssa')}
+						>
+							{moment(data.createdAt).format('Do MMM YYYY')}
+						</FormInput>
 					</FormField>
 				);
 			}
 		}
 
 		if (this.props.list.tracking.createdBy) {
-			data.createdBy = this.props.data.fields[this.props.list.tracking.createdBy];
+			data.createdBy = this.props.data.fields[
+				this.props.list.tracking.createdBy
+			];
 			if (data.createdBy && data.createdBy.name) {
 				let createdByName = getNameFromData(data.createdBy.name);
 				if (createdByName) {
 					elements.push(
 						<FormField key="createdBy" label="Created by">
-							<FormInput noedit>{data.createdBy.name.first} {data.createdBy.name.last}</FormInput>
+							<FormInput noedit>
+								{data.createdBy.name.first} {data.createdBy.name.last}
+							</FormInput>
 						</FormField>
 					);
 				}
@@ -355,24 +427,38 @@ var EditForm = React.createClass({
 		}
 
 		if (this.props.list.tracking.updatedAt) {
-			data.updatedAt = this.props.data.fields[this.props.list.tracking.updatedAt];
-			if (data.updatedAt && (!data.createdAt || data.createdAt !== data.updatedAt)) {
+			data.updatedAt = this.props.data.fields[
+				this.props.list.tracking.updatedAt
+			];
+			if (
+				data.updatedAt
+				&& (!data.createdAt || data.createdAt !== data.updatedAt)
+			) {
 				elements.push(
 					<FormField key="updatedAt" label="Updated on">
-						<FormInput noedit title={moment(data.updatedAt).format('DD/MM/YYYY h:mm:ssa')}>{moment(data.updatedAt).format('Do MMM YYYY')}</FormInput>
+						<FormInput
+							noedit
+							title={moment(data.updatedAt).format('DD/MM/YYYY h:mm:ssa')}
+						>
+							{moment(data.updatedAt).format('Do MMM YYYY')}
+						</FormInput>
 					</FormField>
 				);
 			}
 		}
 
 		if (this.props.list.tracking.updatedBy) {
-			data.updatedBy = this.props.data.fields[this.props.list.tracking.updatedBy];
+			data.updatedBy = this.props.data.fields[
+				this.props.list.tracking.updatedBy
+			];
 			if (data.updatedBy && data.updatedBy.name) {
 				let updatedByName = getNameFromData(data.updatedBy.name);
 				if (updatedByName) {
 					elements.push(
 						<FormField key="updatedBy" label="Updated by">
-							<FormInput noedit>{data.updatedBy.name.first} {data.updatedBy.name.last}</FormInput>
+							<FormInput noedit>
+								{data.updatedBy.name.first} {data.updatedBy.name.last}
+							</FormInput>
 						</FormField>
 					);
 				}
@@ -388,8 +474,14 @@ var EditForm = React.createClass({
 	},
 	render () {
 		return (
-			<form ref="editForm" className="EditForm-container" style={{paddingTop: '2rem'}}>
-				{(this.state.alerts) ? <AlertMessages alerts={this.state.alerts} /> : null}
+			<form
+				ref="editForm"
+				className="EditForm-container"
+				style={{ paddingTop: '2rem' }}
+			>
+				{this.state.alerts ? (
+					<AlertMessages alerts={this.state.alerts} />
+				) : null}
 				<Grid.Row>
 					<Grid.Col large="three-quarters">
 						<Form layout="horizontal" component="div">
@@ -399,7 +491,9 @@ var EditForm = React.createClass({
 							{this.renderTrackingMeta()}
 						</Form>
 					</Grid.Col>
-					<Grid.Col large="one-quarter"><span /></Grid.Col>
+					<Grid.Col large="one-quarter">
+						<span />
+					</Grid.Col>
 				</Grid.Row>
 				{this.renderFooterBar()}
 				<ConfirmationDialog
@@ -408,7 +502,9 @@ var EditForm = React.createClass({
 					onCancel={this.toggleResetDialog}
 					onConfirmation={this.handleReset}
 				>
-					<p>Reset your changes to <strong>{this.props.data.name}</strong>?</p>
+					<p>
+						Reset your changes to <strong>{this.props.data.name}</strong>?
+					</p>
 				</ConfirmationDialog>
 				<ConfirmationDialog
 					confirmationLabel="Delete"
@@ -416,7 +512,8 @@ var EditForm = React.createClass({
 					onCancel={this.toggleDeleteDialog}
 					onConfirmation={this.handleDelete}
 				>
-					Are you sure you want to delete <strong>{this.props.data.name}?</strong>
+					Are you sure you want to delete{' '}
+					<strong>{this.props.data.name}?</strong>
 					<br />
 					<br />
 					This cannot be undone.
