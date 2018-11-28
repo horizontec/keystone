@@ -92,13 +92,10 @@ var EditForm = React.createClass({
 		return props;
 	},
 	handleChange (event) {
-		console.warn('EDIT_CHANGE_FORM', event);
 		const values = assign({}, this.state.values);
 
 		values[event.path] = event.value;
-		this.setState({ values }, () => {
-			console.log('STATE', this.state);
-		});
+		this.setState({ values });
 	},
 
 	toggleDeleteDialog () {
@@ -133,6 +130,8 @@ var EditForm = React.createClass({
 	updateItem () {
 		const { data, list } = this.props;
 		const editForm = this.refs.editForm;
+
+		// Add your relationship key here
 		const relationshipList = ['clients', 'products', 'posts'];
 
 		// Fix for Safari where XHR form submission fails when input[type=file] is empty
@@ -165,7 +164,6 @@ var EditForm = React.createClass({
 		this.setState({
 			loading: true,
 		});
-		console.log('SAVING_FORMDATA', formData);
 
 		list.updateItem(data.id, formData, (err, data) => {
 			smoothScrollTop();

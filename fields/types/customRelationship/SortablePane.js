@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
 import { SortablePane, Pane } from 'react-sortable-pane';
-
 export const PANE_SIZE = 160;
 
 class Sortable extends Component {

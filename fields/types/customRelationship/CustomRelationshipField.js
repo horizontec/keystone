@@ -12,22 +12,13 @@ import {
 } from '../../../admin/client/App/elemental';
 import _ from 'lodash';
 import { Sortable, PANE_SIZE } from './SortablePane';
-
-const addButtonStyle = {
-	borderRadius: 5,
-	opacity: 1,
-	border: '3px dashed #ccc',
-	backgroundColor: 'rgb(245,245,245)',
-	display: 'flex',
-	alignItems: 'center',
-	justifyContent: 'center',
-	cursor: 'pointer',
-	width: PANE_SIZE,
-	height: PANE_SIZE,
-	marginLeft: 20,
-	fontSize: 50,
-	color: '#1385e5',
-};
+import {
+	addButtonStyle,
+	modalStyles,
+	closeModalButton,
+	closeModalButtonText,
+} from './styles';
+import RelationshipList from './RelationshipList';
 
 function compareValues (current, next) {
 	const currentLength = current ? current.length : 0;
@@ -49,6 +40,7 @@ module.exports = Field.create({
 		return {
 			value: null,
 			createIsOpen: false,
+			relationshipModalOpened: false,
 		};
 	},
 
@@ -127,7 +119,6 @@ module.exports = Field.create({
 	},
 
 	loadValue (values) {
-		console.log('LOADING_VALUE', values);
 		if (!values) {
 			return this.setState({
 				loading: false,
@@ -169,7 +160,6 @@ module.exports = Field.create({
 				);
 			},
 			(err, expanded) => {
-				console.log('LOADED_VALUE', expanded);
 
 				if (!this.isMounted()) return;
 				this.setState({
@@ -185,7 +175,6 @@ module.exports = Field.create({
 	loadOptions (input, callback) {
 		// NOTE: this seems like the wrong way to add options to the Select
 		this.loadOptionsCallback = callback;
-		console.log('LOADING_OPTIONS');
 
 		const filters = this.buildFilters();
 		xhr(
@@ -205,7 +194,6 @@ module.exports = Field.create({
 					console.error('Error loading items:', err);
 					return callback(null, []);
 				}
-				console.log('OPTIONS_LOADED', data);
 				data.results.forEach(this.cacheItem);
 				callback(null, {
 					options: data.results,
@@ -216,7 +204,6 @@ module.exports = Field.create({
 	},
 
 	valueChanged (value) {
-		console.log('VALUE_CHANGED', value);
 		this.props.onChange({
 			path: this.props.path,
 			value: value,
@@ -269,23 +256,63 @@ module.exports = Field.create({
 		this.valueChanged(currentValues);
 	},
 
+	toggleRelationshipModal (e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		this.setState(state => ({
+			relationshipModalOpened: !state.relationshipModalOpened,
+		}));
+	},
+
+	addRelationship (id) {
+		const currentValues = this.state.value.map(k => k.id);
+
+		this.valueChanged([...currentValues, id]);
+	},
+
 	renderSelect (noedit) {
-		console.log(this.state.value, this.state.options);
 		if (!this.state.value || !this.state.options) {
 			return null;
 		}
-		const inputName = this.getInputName(this.props.path);
-		const emptyValueInput
-			= this.props.many && (!this.state.value || !this.state.value.length) ? (
-				<input type="hidden" name={inputName} value="" />
-			) : null;
+
 		const emptyValue
 			= Array.isArray(this.state.value) && !this.state.value.length;
 		const allSelected = this.state.value.length === this.state.options.length;
-		const randomId = this.state.options.length ? this.state.options[0] : {}; // this.state.options[0].id;
-
+		const selected = this.state.value.map(k => k.id);
+		const options = [...this.state.options].filter(
+			k => !selected.includes(k.id)
+		);
 		return (
 			<div>
+				{this.state.relationshipModalOpened && (
+					<div
+						className="modalWrapper"
+						style={modalStyles}
+						onClick={this.toggleRelationshipModal}
+					>
+						<div
+							className="modalContent"
+							style={{
+								width: '50%',
+								height: '50%',
+								backgroundColor: '#fff',
+								position: 'relative',
+							}}
+						>
+							<button
+								style={closeModalButton}
+								onClick={this.toggleRelationshipModal}
+							>
+								<div style={closeModalButtonText}>+</div>
+							</button>
+							<RelationshipList
+								items={options}
+								onSelect={this.addRelationship}
+							/>
+						</div>
+					</div>
+				)}
 				<div
 					style={{
 						minHeight: emptyValue ? 0 : PANE_SIZE + 40,
@@ -300,10 +327,7 @@ module.exports = Field.create({
 					/>
 				</div>
 				{!allSelected && (
-					<button
-						style={addButtonStyle}
-						onClick={e => this.addRelationship(e, randomId)}
-					>
+					<button style={addButtonStyle} onClick={this.toggleRelationshipModal}>
 						+
 					</button>
 				)}
