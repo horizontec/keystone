@@ -6,7 +6,6 @@ TODO:
 
 import Field from '../Field'
 import React, { PropTypes } from 'react'
-import Modal from 'react-modal'
 import {
 	Button,
 	FormField,
