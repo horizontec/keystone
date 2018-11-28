@@ -17,7 +17,6 @@ import React, { Component, PropTypes } from 'react';
 class HiddenFileInput extends Component {
 	constructor () {
 		super();
-
 		this.clearValue = this.clearValue.bind(this);
 		this.clickDomNode = this.clickDomNode.bind(this);
 		this.hasValue = this.hasValue.bind(this);
@@ -41,13 +40,14 @@ class HiddenFileInput extends Component {
 		};
 
 		return (
-			<input
+      <input
 				{...props}
 				style={styles}
 				ref={setRef}
 				tabIndex="-1"
 				type="file"
-			/>
+				accept="image/*"
+				/>
 		);
 	}
 };

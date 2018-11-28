@@ -6,6 +6,7 @@ TODO:
 
 import Field from '../Field'
 import React, { PropTypes } from 'react'
+import Modal from 'react-modal'
 import {
 	Button,
 	FormField,
@@ -15,14 +16,40 @@ import {
 import FileChangeMessage from '../../components/FileChangeMessage'
 import HiddenFileInput from '../../components/HiddenFileInput'
 import ImageThumbnail from '../../components/ImageThumbnail'
+import Gallery from '../../components/Gallery'
 
 let uploadInc = 1000
+const customStyles = {
+  content: {
+    top: '10%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    width: '900px',
+    height: '600px',
+    // overflowX: 'hidden',
+    transform: 'translate(-50%, 0)',
+    padding: '0',
+    border: '0',
+    marginBottom: '100px',
+    boxShadow: '6px 2px 13px 0 rgba(139, 141, 146, 0.2)'
+  },
+  overlay: {
+    backgroundColor: 'rgba(27, 36, 62, 0.8)',
+    overflowY: 'scroll',
+    // overflowX: 'hidden',
+    zIndex: '2'
+  }
+}
+
 
 const buildInitialState = props => ({
 	action: null,
 	removeExisting: false,
 	uploadFieldPath: `File-${props.path}-${++uploadInc}`,
-	userSelectedFile: null
+	userSelectedFile: null,
+	modalIsOpen: false,
+	eventFiles:[]
 })
 
 module.exports = Field.create({
@@ -49,6 +76,10 @@ module.exports = Field.create({
 	},
 	getInitialState() {
 		return buildInitialState(this.props)
+	},
+	componentDidMount(){
+	  this.closeModal = this.closeModal.bind(this);
+		this.openModal = this.openModal.bind(this)
 	},
 	shouldCollapse() {
 		return this.props.collapse && !this.hasExisting()
@@ -90,7 +121,7 @@ module.exports = Field.create({
 
 	getImageUrl() {
 		const { filename, mimetype } = this.props.value
-
+		console.log('filename', filename)
 		return `/uploads/${filename}`
 	},
 
@@ -103,9 +134,10 @@ module.exports = Field.create({
 	},
 	handleFileChange(event) {
 		const userSelectedFile = event.target.files[0]
-
+		console.log('change',event.target.files[0])
 		this.setState({
-			userSelectedFile: userSelectedFile
+			userSelectedFile: userSelectedFile,
+			eventFiles: event.target.files
 		})
 	},
 	handleRemove(e) {
@@ -217,7 +249,7 @@ module.exports = Field.create({
 	},
 	renderImagePreview() {
 		const imageSource = this.getImageUrl()
-		console.warn({ imageSource })
+		//console.warn({ imageSource })
 		return (
 			<ImageThumbnail
 				component="a"
@@ -232,12 +264,20 @@ module.exports = Field.create({
 			</ImageThumbnail>
 		)
 	},
+	closeModal (e) {
+		e.preventDefault()
+    this.setState({ modalIsOpen: false })
+  },
+
+  openModal(){
+    this.setState({ modalIsOpen: true })
+  },
 	renderUI() {
 		const { label, note, path, thumb } = this.props
 		const isImage = this.isImage()
 		const hasFile = this.hasFile()
 		// console.table(this.props)
-		console.warn({ isImage, hasFile, thumb })
+		//console.warn({ isImage, hasFile, thumb })
 		const previews = (
 			<div style={isImage ? { marginBottom: '1em' } : null}>
 				{isImage && this.renderImagePreview()}
@@ -253,19 +293,39 @@ module.exports = Field.create({
 				{hasFile && this.renderClearButton()}
 			</div>
 		)
+		const openModalButton = (
+			<div style={hasFile ? { marginTop: '1em' } : null}>
+				<Button onClick={this.openModal}>
+					openModal
+				</Button>
+			</div>
+		)
+
+		const {modalIsOpen} =this.state
+		console.log('modal', modalIsOpen)
+		const modalWindow = (
+			<div style={{position:"fixed", top:0,left:0, width:window.innerWidth, height:'100vh',
+			 backgroundColor:'rgba(0,0,0,0.7)', zIndex:6666, visibility: modalIsOpen? 'visible': 'hidden'}}>
+				<Gallery
+					key={this.state.uploadFieldPath}
+					name={this.state.uploadFieldPath}
+					onChange={this.handleFileChange}
+					hasFile={hasFile}
+					triggerFileBrowser={this.triggerFileBrowser}
+					renderClearButton={this.renderClearButton}
+					closeModal={this.closeModal}
+				/>
+				{modalIsOpen && previews}
+			</div>
+		)
 		return (
-			<div data-field-name={path} data-field-type="file">
+			 <div data-field-name={path} data-field-type="file">
 				<FormField label={label} htmlFor={path}>
 					{this.shouldRenderField() ? (
 						<div>
 							{previews}
-							{buttons}
-							<HiddenFileInput
-								key={this.state.uploadFieldPath}
-								name={this.state.uploadFieldPath}
-								onChange={this.handleFileChange}
-								ref="fileInput"
-							/>
+							{openModalButton}
+							{modalWindow}
 							{this.renderActionInput()}
 						</div>
 					) : (

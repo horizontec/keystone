@@ -142,6 +142,7 @@ var EditForm = React.createClass({
 			if ($(this).get(0).files.length === 0) { $(this).prop('disabled', false); }
 		});
 
+		console.log('123',editForm)
 		// Show loading indicator
 		this.setState({
 			loading: true,
