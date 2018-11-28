@@ -133,6 +133,7 @@ var EditForm = React.createClass({
 	updateItem () {
 		const { data, list } = this.props;
 		const editForm = this.refs.editForm;
+		const relationshipList = ['clients', 'products', 'posts'];
 
 		// Fix for Safari where XHR form submission fails when input[type=file] is empty
 		// https://stackoverflow.com/questions/49614091/safari-11-1-ajax-xhr-form-submission-fails-when-inputtype-file-is-empty
@@ -153,9 +154,12 @@ var EditForm = React.createClass({
 				}
 			});
 
-		this.state.values.products.forEach(k => formData.append('products', k));
-		this.state.values.clients.forEach(k => formData.append('clients', k));
-		this.state.values.posts.forEach(k => formData.append('posts', k));
+		relationshipList.forEach(relation => {
+			if (!this.state.values[relation].length) {
+				formData.append(relation, '');
+			}
+			this.state.values[relation].forEach(k => formData.append(relation, k));
+		});
 
 		// Show loading indicator
 		this.setState({
