@@ -6,6 +6,10 @@ TODO:
 
 import Field from '../Field'
 import React, { PropTypes } from 'react'
+import Field from '../Field';
+import React, { PropTypes } from 'react';
+import xhr from 'xhr';
+
 import {
 	Button,
 	FormField,
@@ -48,7 +52,7 @@ const buildInitialState = props => ({
 	uploadFieldPath: `File-${props.path}-${++uploadInc}`,
 	userSelectedFile: null,
 	modalIsOpen: false,
-	eventFiles:[]
+	photoUrl:[]
 })
 
 module.exports = Field.create({
@@ -78,7 +82,8 @@ module.exports = Field.create({
 	},
 	componentDidMount(){
 	  this.closeModal = this.closeModal.bind(this);
-		this.openModal = this.openModal.bind(this)
+		this.openModal = this.openModal.bind(this);
+		this.loadPhoto();
 	},
 	shouldCollapse() {
 		return this.props.collapse && !this.hasExisting()
@@ -262,6 +267,14 @@ module.exports = Field.create({
 				/>
 			</ImageThumbnail>
 		)
+	},
+	loadPhoto() {
+		xhr({
+			url: Keystone.adminPath + '/api/' + 'locals',
+			responseType: 'json',
+		},(err, resp, data) => {
+			console.log('here', data);
+		});
 	},
 	closeModal (e) {
 		e.preventDefault()
