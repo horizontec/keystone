@@ -11,6 +11,7 @@ class Gallery extends Component {
 		this.refs.fileInput.clickDomNode()
 	}
   render() {
+    const {previewsGallery} = this.props
     const buttons = (
 			<div style={this.props.hasFile ? { marginTop: '1em' } : null}>
 				<Button onClick={this.triggerFileBrowser}>
@@ -23,6 +24,7 @@ class Gallery extends Component {
       <div>
         <button onClick={this.props.closeModal}>X</button>
         {buttons}
+        {previewsGallery}
         <HiddenFileInput
 					key={this.props.key}
 					name={this.props.name}

@@ -9,13 +9,13 @@ var _getAllFilesFromFolder = function(dir) {
 
 	filesystem.readdirSync(dir).forEach(function(file) {
 
-			file = dir+'/'+file;
+			/* file = dir+'/'+file;
 			var stat = filesystem.statSync(file);
 
 			if (stat && stat.isDirectory()) {
 					results = results.concat(_getAllFilesFromFolder(file))
-			} 
-			else 
+			}
+			else */
 				results.push(file);
 
 	});

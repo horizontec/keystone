@@ -101,7 +101,7 @@ function validateInput (value) {
 	// undefined, null and empty values are always valid
 	if (value === undefined || value === null || value === '') return true;
 	// If a string is provided, check it is an upload or delete instruction
-	if (typeof value === 'string' && /^(upload\:)|(delete$)/.test(value)) return true;
+	if (typeof value === 'string' && /^(select\:)|(upload\:)|(delete$)/.test(value)) return true;
 	// If the value is an object with a filename property, it is a stored value
 	// TODO: Need to actually check a dynamic path based on the adapter
 	if (typeof value === 'object' && value.filename) return true;
@@ -158,6 +158,15 @@ imageUploader.prototype.updateItem = function (item, data, files, callback) {
 	if (value === 'remove') {
 		this.remove(item);
 		utils.defer(callback);
+	}
+
+	if (typeof value === 'string' && value.substr(0, 7) === 'select:') {
+		uploadedFile = {
+			mimetype: 'image',
+			filename: value.substr(7),
+		};
+		item.set(this.path, uploadedFile);
+		return utils.defer(callback);
 	}
 
 	// Find an uploaded file in the files argument, either referenced in the

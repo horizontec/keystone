@@ -6,8 +6,6 @@ TODO:
 
 import Field from '../Field'
 import React, { PropTypes } from 'react'
-import Field from '../Field';
-import React, { PropTypes } from 'react';
 import xhr from 'xhr';
 
 import {
@@ -81,9 +79,10 @@ module.exports = Field.create({
 		return buildInitialState(this.props)
 	},
 	componentDidMount(){
+		this.loadPhoto = this.loadPhoto.bind(this)
+		this.previewsGallery = this.previewsGallery.bind(this)
 	  this.closeModal = this.closeModal.bind(this);
 		this.openModal = this.openModal.bind(this);
-		this.loadPhoto();
 	},
 	shouldCollapse() {
 		return this.props.collapse && !this.hasExisting()
@@ -125,7 +124,6 @@ module.exports = Field.create({
 
 	getImageUrl() {
 		const { filename, mimetype } = this.props.value
-		console.log('filename', filename)
 		return `/uploads/${filename}`
 	},
 
@@ -138,7 +136,6 @@ module.exports = Field.create({
 	},
 	handleFileChange(event) {
 		const userSelectedFile = event.target.files[0]
-		console.log('change',event.target.files[0])
 		this.setState({
 			userSelectedFile: userSelectedFile,
 			eventFiles: event.target.files
@@ -239,6 +236,8 @@ module.exports = Field.create({
 				? `upload:${this.state.uploadFieldPath}`
 				: this.state.action === 'delete'
 				? 'remove'
+				: this.state.action === 'select'
+				? `select:${this.state.uploadFieldPath}`
 				: ''
 			return (
 				<input
@@ -253,7 +252,6 @@ module.exports = Field.create({
 	},
 	renderImagePreview() {
 		const imageSource = this.getImageUrl()
-		//console.warn({ imageSource })
 		return (
 			<ImageThumbnail
 				component="a"
@@ -268,12 +266,35 @@ module.exports = Field.create({
 			</ImageThumbnail>
 		)
 	},
+
+	chooseFile(one){
+		this.setState({
+			action: 'select',
+			uploadFieldPath: one
+		})
+	},
+
+	previewsGallery() {
+		return (
+			this.state.photoUrl.map(one =>
+				<div onClick={() => this.chooseFile(one)}>
+				<img
+					src={`/uploads/${one}`}
+					style={{ 'max-height': 100, 'max-width': '100%' }}
+				/>
+				</div>
+			)
+		)
+	},
+
 	loadPhoto() {
 		xhr({
 			url: Keystone.adminPath + '/api/' + 'locals',
 			responseType: 'json',
 		},(err, resp, data) => {
-			console.log('here', data);
+			this.setState({
+				photoUrl: data.locals
+			})
 		});
 	},
 	closeModal (e) {
@@ -282,18 +303,23 @@ module.exports = Field.create({
   },
 
   openModal(){
+		this.loadPhoto();
     this.setState({ modalIsOpen: true })
   },
 	renderUI() {
 		const { label, note, path, thumb } = this.props
 		const isImage = this.isImage()
 		const hasFile = this.hasFile()
-		// console.table(this.props)
-		//console.warn({ isImage, hasFile, thumb })
 		const previews = (
 			<div style={isImage ? { marginBottom: '1em' } : null}>
 				{isImage && this.renderImagePreview()}
 				{hasFile && this.renderFileNameAndChangeMessage()}
+			</div>
+		)
+
+		const previewsGallery = (
+			<div>
+				{this.previewsGallery()}
 			</div>
 		)
 
@@ -314,7 +340,6 @@ module.exports = Field.create({
 		)
 
 		const {modalIsOpen} =this.state
-		console.log('modal', modalIsOpen)
 		const modalWindow = (
 			<div style={{position:"fixed", top:0,left:0, width:window.innerWidth, height:'100vh',
 			 backgroundColor:'rgba(0,0,0,0.7)', zIndex:6666, visibility: modalIsOpen? 'visible': 'hidden'}}>
@@ -326,6 +351,7 @@ module.exports = Field.create({
 					triggerFileBrowser={this.triggerFileBrowser}
 					renderClearButton={this.renderClearButton}
 					closeModal={this.closeModal}
+					previewsGallery={previewsGallery}
 				/>
 				{modalIsOpen && previews}
 			</div>

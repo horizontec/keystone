@@ -39,7 +39,7 @@ ImageThumbnail.propTypes = {
 		PropTypes.string,
 		PropTypes.func,
 	]),
-	mask: PropTypes.oneOf(['loading', 'remove', 'upload']),
+	mask: PropTypes.oneOf(['loading', 'remove', 'upload', 'select']),
 };
 ImageThumbnail.defaultProps = {
 	component: 'span',
