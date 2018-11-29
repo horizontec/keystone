@@ -97,7 +97,6 @@ class Sortable extends Component {
 	}
 
 	render () {
-		console.log({ paneItems: this.props.items });
 		if (!this.props.items.length) {
 			return null;
 		}
