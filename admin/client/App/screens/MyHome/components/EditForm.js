@@ -132,7 +132,7 @@ var EditForm = React.createClass({
 		const editForm = this.refs.editForm;
 
 		// Ali, Zhenya, Vlad, add your relationship key here :)
-		const relationshipList = ['clients', 'products'];
+		const relationshipList = ['clients', 'products', 'references'];
 
 		// Fix for Safari where XHR form submission fails when input[type=file] is empty
 		// https://stackoverflow.com/questions/49614091/safari-11-1-ajax-xhr-form-submission-fails-when-inputtype-file-is-empty
